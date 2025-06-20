@@ -4,6 +4,7 @@ from src.vectorizer import vectorize_text
 from src.train import train_model
 from src.visualize_results import print_detailed_summary
 from sklearn.metrics import classification_report
+from src.glove_vectorizer import load_glove_embeddings, vectorize_with_glove
 
 def main():
     # 1. Wczytanie danych z pliku JSON
@@ -42,6 +43,27 @@ def main():
 
     # (opcjonalnie) zapisanie modelu:
     # train_model(..., save_path="models/intent_model.pkl")
+
+
+    print("\n\n--- Testing GloVe Vectorizer ---")
+
+    # 1. Załaduj GloVe embeddingi
+    glove_path = "data/glove.6B.50d.txt"
+    glove_embeddings = load_glove_embeddings(glove_path)
+
+    # 2. Zamień teksty na wektory GloVe (średnia z wektorów słów)
+    X_train_glove = vectorize_with_glove(cleaned_train, glove_embeddings)
+    X_val_glove = vectorize_with_glove(cleaned_val, glove_embeddings)
+    X_test_glove = vectorize_with_glove(cleaned_test, glove_embeddings)
+
+    # 3. Trenuj nowy model na GloVe
+    glove_model = train_model(X_train_glove, y_train, X_val_glove, y_val)
+
+    # 4. Ewaluacja na danych testowych
+    y_pred_glove = glove_model.predict(X_test_glove)
+
+    print("\nGloVe Model - Test Predictions:")
+    print(classification_report(y_test, y_pred_glove))
 
 if __name__ == "__main__":
     main()
