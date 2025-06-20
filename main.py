@@ -2,7 +2,8 @@ from src.load_data import load_clinc150_data
 from src.preprocessing import clean_text
 from src.vectorizer import vectorize_text
 from src.train import train_model
-from sklearn.metrics import classification_report  # dodaj na górze pliku
+from src.visualize_results import print_detailed_summary
+from sklearn.metrics import classification_report
 
 def main():
     # 1. Wczytanie danych z pliku JSON
@@ -34,8 +35,10 @@ def main():
     print("Test Predictions:")
     print(classification_report(y_test, y_pred))
 
-
-
+    # 7. Enhanced summary analysis (text only)
+    y_val_pred = model.predict(X_val)
+    print_detailed_summary(y_val, y_val_pred, "Validation")
+    print_detailed_summary(y_test, y_pred, "Test")
 
     # (opcjonalnie) zapisanie modelu:
     # train_model(..., save_path="models/intent_model.pkl")
